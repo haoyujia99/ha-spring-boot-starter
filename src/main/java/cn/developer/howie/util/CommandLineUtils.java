@@ -18,13 +18,16 @@ public class CommandLineUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandLineUtils.class);
 
+    private static final String IF_CONFIG = "ifconfig";
+    private static final String ARPING = "arping";
+
     private CommandLineUtils() throws InstantiationException {
         throw new InstantiationException("Prohibited From Instantiating CommandLineUtils.class");
     }
 
     public static void unbindVirtualHost(String virtualNetworkInterface, String virtualHostAddress) {
 
-        CommandLine commandLine = new CommandLine("ifconfig");
+        CommandLine commandLine = new CommandLine(IF_CONFIG);
         commandLine.addArgument(virtualNetworkInterface);
         commandLine.addArgument(virtualHostAddress);
         commandLine.addArgument("down");
@@ -33,12 +36,24 @@ public class CommandLineUtils {
 
     public static void bindVirtualHost(String virtualNetworkInterface, String virtualHostAddress, String netmask) {
 
-        CommandLine commandLine = new CommandLine("ifconfig");
+        CommandLine commandLine = new CommandLine(IF_CONFIG);
         commandLine.addArgument(virtualNetworkInterface);
         commandLine.addArgument(virtualHostAddress);
         commandLine.addArgument("netmask");
         commandLine.addArgument(netmask);
         commandLine.addArgument("up");
+        execute(commandLine);
+    }
+
+    public static void refreshArpCache(String networkInterface, String virtualHostAddress) {
+
+        CommandLine commandLine = new CommandLine(ARPING);
+        commandLine.addArgument("-bUA");
+        commandLine.addArgument("-c");
+        commandLine.addArgument("2");
+        commandLine.addArgument("-I");
+        commandLine.addArgument(networkInterface);
+        commandLine.addArgument(virtualHostAddress);
         execute(commandLine);
     }
 
@@ -52,10 +67,7 @@ public class CommandLineUtils {
 
             DefaultExecutor defaultExecutor = new DefaultExecutor();
             try {
-                int exitValue = defaultExecutor.execute(commandLine);
-                if (0 != exitValue) {
-                    logger.info("### exit: {} ###", exitValue);
-                }
+                defaultExecutor.execute(commandLine);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }

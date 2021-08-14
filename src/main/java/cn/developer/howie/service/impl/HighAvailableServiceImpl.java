@@ -113,6 +113,7 @@ public class HighAvailableServiceImpl implements HighAvailableService {
         HighAvailableConstant.NODE_STATUS_ENUM.set(NodeStatusEnum.MASTER);
         heartBeatReceiveThread.interrupt();
         bindVirtualHost();
+        refreshArpCache();
         logger.info("### Current node has become the master node ###");
 
         serviceInitializationHandler.onMaster();
@@ -126,6 +127,15 @@ public class HighAvailableServiceImpl implements HighAvailableService {
                 highAvailableProperties.getNetmask()
         );
         logger.info("### Bound virtual host ###");
+    }
+
+    private void refreshArpCache() {
+
+        CommandLineUtils.refreshArpCache(
+                highAvailableProperties.getNetworkInterface(),
+                highAvailableProperties.getVirtualHostAddress()
+        );
+        logger.info("### Refresh Arp Cache ###");
     }
 
     private void onSlave() {

@@ -4,17 +4,17 @@ import cn.developer.howie.service.HighAvailableService;
 import org.springframework.boot.CommandLineRunner;
 
 /**
- * cn.developer.howie.command.HighAvailableCommand.java
+ * cn.developer.howie.command.HighAvailableClusterCommand.java
  *
  * @author Hao, Yujia
  * @version v1.0
- * @since 8/1/2021 11:09 AM
+ * @since 8/14/2021 10:09 AM
  */
-public class HighAvailableCommand implements CommandLineRunner {
+public class HighAvailableClusterCommand implements CommandLineRunner {
 
     private final HighAvailableService highAvailableService;
 
-    public HighAvailableCommand(HighAvailableService highAvailableService) {
+    public HighAvailableClusterCommand(HighAvailableService highAvailableService) {
         this.highAvailableService = highAvailableService;
     }
 

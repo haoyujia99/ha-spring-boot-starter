@@ -1,6 +1,7 @@
 package cn.developer.howie.config;
 
-import cn.developer.howie.command.HighAvailableCommand;
+import cn.developer.howie.command.HighAvailableClusterCommand;
+import cn.developer.howie.command.HighAvailableStandaloneCommand;
 import cn.developer.howie.model.property.HighAvailableProperties;
 import cn.developer.howie.service.HighAvailableService;
 import cn.developer.howie.service.NodeSelectionStrategy;
@@ -24,7 +25,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @EnableAsync
 @EnableConfigurationProperties(value = HighAvailableProperties.class)
-@ConditionalOnProperty(name = "ha.enable", havingValue = "true")
 @Configuration
 public class HighAvailableAutoConfiguration {
 
@@ -35,22 +35,31 @@ public class HighAvailableAutoConfiguration {
     }
 
     @ConditionalOnMissingBean(value = NodeSelectionStrategy.class)
+    @ConditionalOnProperty(name = "ha.enable", havingValue = "true")
     @Bean
     public NodeSelectionStrategy nodeSelectionStrategy(HighAvailableProperties highAvailableProperties) {
         return new DefaultNodeSelectionStrategy(highAvailableProperties);
     }
 
+    @ConditionalOnProperty(name = "ha.enable", havingValue = "true")
     @Bean
-    public HighAvailableService highAvailableProperties(
+    public HighAvailableService highAvailableService(
             HighAvailableProperties highAvailableProperties,
             ServiceInitializationHandler serviceInitializationHandler,
             NodeSelectionStrategy nodeSelectionStrategy) {
         return new HighAvailableServiceImpl(highAvailableProperties, serviceInitializationHandler, nodeSelectionStrategy);
     }
 
+    @ConditionalOnProperty(name = "ha.enable", havingValue = "true")
     @Bean
-    public HighAvailableCommand highAvailableCommand(HighAvailableService highAvailableService) {
-        return new HighAvailableCommand(highAvailableService);
+    public HighAvailableClusterCommand highAvailableClusterCommand(HighAvailableService highAvailableService) {
+        return new HighAvailableClusterCommand(highAvailableService);
+    }
+
+    @ConditionalOnProperty(name = "ha.enable", havingValue = "false")
+    @Bean
+    public HighAvailableStandaloneCommand highAvailableStandaloneCommand(ServiceInitializationHandler serviceInitializationHandler) {
+        return new HighAvailableStandaloneCommand(serviceInitializationHandler);
     }
 
 }
