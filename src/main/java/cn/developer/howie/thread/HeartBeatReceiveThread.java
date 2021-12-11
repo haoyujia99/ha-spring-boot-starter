@@ -10,7 +10,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * cn.developer.howie.thread.HeartBeatReceiveThread.java
@@ -24,8 +23,6 @@ public class HeartBeatReceiveThread implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(HeartBeatReceiveThread.class);
 
     private static final int BUFFER_LENGTH = 1024;
-
-    private final AtomicBoolean interrupt = new AtomicBoolean(false);
 
     private final HighAvailableProperties highAvailableProperties;
     private final BlockingQueue<String> blockingQueue;
@@ -63,11 +60,11 @@ public class HeartBeatReceiveThread implements Runnable {
         DatagramPacket datagramPacket = new DatagramPacket(bytebuffer, bytebuffer.length);
 
         try (DatagramSocket datagramSocket = new DatagramSocket(heartbeatPort)) {
-            while (!interrupt.get()) {
+            while (true) {
                 datagramSocket.receive(datagramPacket);
                 String message = new String(datagramPacket.getData(), 0, datagramPacket.getLength(), StandardCharsets.UTF_8);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("### receive: {} ###", message);
+                    logger.debug("### Receive: {} ###", message);
                 }
                 blockingQueue.add(message);
             }
@@ -75,16 +72,6 @@ public class HeartBeatReceiveThread implements Runnable {
             logger.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
         }
-    }
-
-    /**
-     * interrupt current thread
-     */
-    public void interrupt() {
-
-        interrupt.set(true);
-        blockingQueue.clear();
-        logger.info("### HeartBeatReceiveThread has been interrupted ###");
     }
 
 }

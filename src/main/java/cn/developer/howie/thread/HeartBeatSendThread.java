@@ -15,7 +15,6 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * cn.developer.howie.thread.HeartBeatSendThread.java
@@ -27,8 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HeartBeatSendThread implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(HeartBeatSendThread.class);
-
-    private final AtomicBoolean interrupt = new AtomicBoolean(false);
 
     private final HighAvailableProperties highAvailableProperties;
 
@@ -71,10 +68,10 @@ public class HeartBeatSendThread implements Runnable {
     private void send(String localHostAddress, InetSocketAddress inetSocketAddress) {
 
         try (DatagramSocket datagramSocket = new DatagramSocket()) {
-            while (!interrupt.get()) {
+            while (true) {
                 String message = GsonUtils.toJson(new HeartBeatMessage(localHostAddress, LocalTime.now(), HighAvailableConstant.NODE_STATUS_ENUM.get()));
                 if (logger.isDebugEnabled()) {
-                    logger.debug("### receive: {} ###", message);
+                    logger.debug("### Send: {} ###", message);
                 }
                 DatagramPacket datagramPacket = new DatagramPacket(message.getBytes(StandardCharsets.UTF_8), message.length(), inetSocketAddress);
                 datagramSocket.send(datagramPacket);
@@ -84,15 +81,6 @@ public class HeartBeatSendThread implements Runnable {
             logger.error(e.getMessage(), e);
             Thread.currentThread().interrupt();
         }
-    }
-
-    /**
-     * interrupt current thread
-     */
-    public void interrupt() {
-
-        interrupt.set(true);
-        logger.info("### HeartBeatSendThread has been interrupted ###");
     }
 
 }

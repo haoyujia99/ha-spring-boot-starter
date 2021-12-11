@@ -10,17 +10,17 @@ package cn.developer.howie.model.enums;
 public enum NodeStatusEnum {
 
     /**
-     * HA function init
+     * init status
      */
     PREPARE,
 
     /**
-     * master
+     * be master
      */
     MASTER,
 
     /**
-     * slave
+     * be slave
      */
     SLAVE
 

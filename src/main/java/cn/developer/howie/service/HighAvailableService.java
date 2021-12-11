@@ -22,4 +22,9 @@ public interface HighAvailableService {
      */
     void onMaster();
 
+    /**
+     * when node becomes slave
+     */
+    void onSlave();
+
 }

@@ -28,7 +28,7 @@ public class DefaultNodeSelectionStrategy implements NodeSelectionStrategy {
      * @return is current service can be master node
      */
     @Override
-    public boolean canMaster(HeartBeatMessage heartBeatMessage) {
+    public boolean canBeMaster(HeartBeatMessage heartBeatMessage) {
 
         String targetAddress = heartBeatMessage.getAddress();
         String localHostAddress = IpUtils.getByName(highAvailableProperties.getNetworkInterface());
