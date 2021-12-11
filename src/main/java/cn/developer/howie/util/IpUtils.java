@@ -39,7 +39,7 @@ public class IpUtils {
         try {
             networkInterface = NetworkInterface.getByName(name.toLowerCase());
             if (null == networkInterface) {
-                logger.error("### can't find network interface: {} ###", name);
+                logger.error("### Can't find network interface: {} ###", name);
                 return localHostAddress;
             }
         } catch (SocketException e) {

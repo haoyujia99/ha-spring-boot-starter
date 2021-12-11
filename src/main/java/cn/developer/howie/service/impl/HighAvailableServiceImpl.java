@@ -34,11 +34,6 @@ public class HighAvailableServiceImpl implements HighAvailableService {
 
     private final BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
 
-    private HeartBeatReceiveThread heartBeatReceiveThread;
-    private HeartBeatSendThread heartBeatSendThread;
-    private HeartBeatMonitorThread heartBeatMonitorThread;
-    private ThreadPoolExecutor threadPoolExecutor;
-
     private final HighAvailableProperties highAvailableProperties;
     private final ServiceInitializationHandler serviceInitializationHandler;
     private final NodeSelectionStrategy nodeSelectionStrategy;
@@ -55,8 +50,8 @@ public class HighAvailableServiceImpl implements HighAvailableService {
     @PostConstruct
     public void init() {
 
-        threadPoolExecutor = new ThreadPoolExecutor(
-                2,
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                3,
                 5,
                 30,
                 TimeUnit.SECONDS,
@@ -64,12 +59,14 @@ public class HighAvailableServiceImpl implements HighAvailableService {
                 runnable -> new Thread(runnable, "ha-thread")
         );
 
-        heartBeatReceiveThread = new HeartBeatReceiveThread(highAvailableProperties, blockingQueue);
-        heartBeatSendThread = new HeartBeatSendThread(highAvailableProperties);
-        heartBeatMonitorThread = new HeartBeatMonitorThread(blockingQueue, highAvailableProperties, this);
-
-        threadPoolExecutor.execute(heartBeatReceiveThread);
-        threadPoolExecutor.execute(heartBeatSendThread);
+        threadPoolExecutor.execute(new HeartBeatReceiveThread(highAvailableProperties, blockingQueue));
+        threadPoolExecutor.execute(new HeartBeatSendThread(highAvailableProperties));
+        threadPoolExecutor.execute(new HeartBeatMonitorThread(
+                blockingQueue,
+                highAvailableProperties,
+                this,
+                nodeSelectionStrategy
+        ));
     }
 
     /**
@@ -90,7 +87,7 @@ public class HighAvailableServiceImpl implements HighAvailableService {
             if (NodeStatusEnum.MASTER.equals(heartBeatMessage.getNodeStatusEnum())) {
                 onSlave();
             } else {
-                if (nodeSelectionStrategy.canMaster(heartBeatMessage)) {
+                if (nodeSelectionStrategy.canBeMaster(heartBeatMessage)) {
                     onMaster();
                 } else {
                     onSlave();
@@ -105,13 +102,7 @@ public class HighAvailableServiceImpl implements HighAvailableService {
     @Override
     public void onMaster() {
 
-        if (NodeStatusEnum.SLAVE.equals(HighAvailableConstant.NODE_STATUS_ENUM.get())) {
-            heartBeatMonitorThread.interrupt();
-            threadPoolExecutor.execute(new HeartBeatSendThread(highAvailableProperties));
-        }
-
         HighAvailableConstant.NODE_STATUS_ENUM.set(NodeStatusEnum.MASTER);
-        heartBeatReceiveThread.interrupt();
         bindVirtualHost();
         refreshArpCache();
         logger.info("### Current node has become the master node ###");
@@ -138,11 +129,13 @@ public class HighAvailableServiceImpl implements HighAvailableService {
         logger.info("### Refresh Arp Cache ###");
     }
 
-    private void onSlave() {
+    /**
+     * when node becomes slave
+     */
+    @Override
+    public void onSlave() {
 
         HighAvailableConstant.NODE_STATUS_ENUM.set(NodeStatusEnum.SLAVE);
-        heartBeatSendThread.interrupt();
-        threadPoolExecutor.execute(heartBeatMonitorThread);
         logger.info("### Current node has become the slave node ###");
 
         serviceInitializationHandler.onSlave();

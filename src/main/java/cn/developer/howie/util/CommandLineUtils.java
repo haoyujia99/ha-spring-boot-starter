@@ -61,7 +61,7 @@ public class CommandLineUtils {
 
         String property = System.getProperty("os.name");
         if (property.contains("Windows")) {
-            logger.info("### doesn't run command {} on windows ###", commandLine);
+            logger.info("### Doesn't run command {} on windows ###", commandLine);
         } else {
             logger.info("### Execute command: {} ###", commandLine);
 

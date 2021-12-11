@@ -18,6 +18,6 @@ public interface NodeSelectionStrategy {
      * @param heartBeatMessage received message
      * @return is current service can be master node
      */
-    boolean canMaster(HeartBeatMessage heartBeatMessage);
+    boolean canBeMaster(HeartBeatMessage heartBeatMessage);
 
 }
