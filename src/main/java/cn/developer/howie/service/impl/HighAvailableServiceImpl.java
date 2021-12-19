@@ -138,6 +138,9 @@ public class HighAvailableServiceImpl implements HighAvailableService {
         HighAvailableConstant.NODE_STATUS_ENUM.set(NodeStatusEnum.SLAVE);
         logger.info("### Current node has become the slave node ###");
 
+        CommandLineUtils.unbindVirtualHost(highAvailableProperties.getVirtualNetworkInterface(), highAvailableProperties.getVirtualHostAddress());
+        logger.info("### Unbound exist virtual host configuration ###");
+
         serviceInitializationHandler.onSlave();
     }
 
