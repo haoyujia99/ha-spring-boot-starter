@@ -69,7 +69,7 @@ public class HeartBeatSendThread implements Runnable {
 
         try (DatagramSocket datagramSocket = new DatagramSocket()) {
             while (true) {
-                String message = GsonUtils.toJson(new HeartBeatMessage(localHostAddress, LocalTime.now(), HighAvailableConstant.NODE_STATUS_ENUM.get()));
+                String message = GsonUtils.toJson(new HeartBeatMessage(localHostAddress, LocalTime.now(), HighAvailableConstant.CURRENT_NODE_STATUS.get()));
                 if (logger.isDebugEnabled()) {
                     logger.debug("### Send: {} ###", message);
                 }

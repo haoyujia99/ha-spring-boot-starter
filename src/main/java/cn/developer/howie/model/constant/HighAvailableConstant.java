@@ -17,6 +17,6 @@ public class HighAvailableConstant {
         throw new InstantiationException("Prohibited From Instantiating HighAvailableConstant.class");
     }
 
-    public static final AtomicReference<NodeStatusEnum> NODE_STATUS_ENUM = new AtomicReference<>(NodeStatusEnum.PREPARE);
+    public static final AtomicReference<NodeStatusEnum> CURRENT_NODE_STATUS = new AtomicReference<>(NodeStatusEnum.PREPARE);
 
 }

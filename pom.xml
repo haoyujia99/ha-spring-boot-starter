@@ -12,7 +12,7 @@
 
     <groupId>cn.developer.howie</groupId>
     <artifactId>ha-spring-boot-starter</artifactId>
-    <version>2021.08.01.RELEASE</version>
+    <version>2021.12.25.RELEASE</version>
 
     <properties>
         <java.version>1.8</java.version>

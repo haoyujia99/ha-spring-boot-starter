@@ -28,7 +28,7 @@ public class HighAvailableStandaloneCommand implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        HighAvailableConstant.NODE_STATUS_ENUM.set(NodeStatusEnum.MASTER);
+        HighAvailableConstant.CURRENT_NODE_STATUS.set(NodeStatusEnum.MASTER);
         serviceInitializationHandler.onMaster();
     }
 

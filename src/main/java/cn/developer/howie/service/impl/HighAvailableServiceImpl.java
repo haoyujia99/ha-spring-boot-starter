@@ -102,7 +102,7 @@ public class HighAvailableServiceImpl implements HighAvailableService {
     @Override
     public void onMaster() {
 
-        HighAvailableConstant.NODE_STATUS_ENUM.set(NodeStatusEnum.MASTER);
+        HighAvailableConstant.CURRENT_NODE_STATUS.set(NodeStatusEnum.MASTER);
         bindVirtualHost();
         refreshArpCache();
         logger.info("### Current node has become the master node ###");
@@ -135,7 +135,7 @@ public class HighAvailableServiceImpl implements HighAvailableService {
     @Override
     public void onSlave() {
 
-        HighAvailableConstant.NODE_STATUS_ENUM.set(NodeStatusEnum.SLAVE);
+        HighAvailableConstant.CURRENT_NODE_STATUS.set(NodeStatusEnum.SLAVE);
         logger.info("### Current node has become the slave node ###");
 
         CommandLineUtils.unbindVirtualHost(highAvailableProperties.getVirtualNetworkInterface(), highAvailableProperties.getVirtualHostAddress());

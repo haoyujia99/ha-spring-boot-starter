@@ -64,7 +64,7 @@ public class HeartBeatMonitorThread implements Runnable {
                     if (logger.isDebugEnabled()) {
                         logger.debug("### Hasn't receive heart beat message over {}s, becoming master node ###", heartbeatTimeout);
                     }
-                    if (!NodeStatusEnum.MASTER.equals(HighAvailableConstant.NODE_STATUS_ENUM.get())) {
+                    if (!NodeStatusEnum.MASTER.equals(HighAvailableConstant.CURRENT_NODE_STATUS.get())) {
                         highAvailableService.onMaster();
                     }
                 } else {
@@ -80,9 +80,9 @@ public class HeartBeatMonitorThread implements Runnable {
     private void validateMessage(String message) {
 
         HeartBeatMessage heartBeatMessage = GsonUtils.fromJson(message, HeartBeatMessage.class);
-        if (NodeStatusEnum.MASTER.equals(HighAvailableConstant.NODE_STATUS_ENUM.get())
-                && NodeStatusEnum.MASTER.equals(heartBeatMessage.getNodeStatusEnum())) {
-            logger.warn("### Both target and current node have become master node, re-select the master node ###");
+        NodeStatusEnum nodeStatusEnum = HighAvailableConstant.CURRENT_NODE_STATUS.get();
+        if (nodeStatusEnum.equals(heartBeatMessage.getNodeStatusEnum())) {
+            logger.warn("### Both target and current node have become {} node, re-select the master node ###", nodeStatusEnum);
             if (nodeSelectionStrategy.canBeMaster(heartBeatMessage)) {
                 highAvailableService.onMaster();
             } else {
